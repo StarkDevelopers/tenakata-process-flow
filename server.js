@@ -2,24 +2,23 @@ require('dotenv').config();
 const express = require('express');
 const registerMorgan = require('./middlewares/morgan');
 const initializeSession = require('./middlewares/session');
-const auth = require('./middlewares/auth');
+const registerBodyParser = require('./middlewares/bodyParser');
 const responses = require('./response.json');
 
 const app = express();
 
+registerBodyParser(app);
 initializeSession(app);
 registerMorgan(app);
-app.use(auth());
 
-app.get('/', (req, res) => {
-  if (req.session.step) {
-    req.session.step++;
-  } else {
-    req.session.step = 1;
-  }
+app.post('*', (req, res) => {
   const step = req.session.step;
   const response = responses[`STEP ${step}`];
   return res.send(response || 'You reached the end!!!');
+});
+
+app.all('*', (req, res) => {
+  return res.send('Only POST Method is implemented for this service.');
 });
 
 app.listen(process.env.PORT, () => {

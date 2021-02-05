@@ -1,12 +1,4 @@
 {
-  "STEP 1": "Welcome to Tenakata. Please Reply with your PIN:",
-  "STEP 2": "Please select the service to do:",
-  "STEP 3": "Step 3",
-  "STEP 4": "Step 4",
-  "STEP 5": "Step 5",
-  "STEP 6": "Step 6",
-  "STEP 7": "Step 7",
-  "STEP 8": "Step 8",
-  "STEP 9": "Step 9",
-  "STEP 10": "Step 10"
+  "STEP 1": "CON Welcome to Tenakata. Please Reply with your PIN:",
+  "STEP 2": "CON Please select the service to do:\n1. Balance\n2. Mini Statement\n3. END"
 }

@@ -1,35 +1,41 @@
-const session = require('express-session');
-
-const SECRET_KEY = process.env.SECRET_KEY;
+const redis = require('../helpers/redis');
 
 module.exports = initializeSession;
 
 function initializeSession (app) {
-  const sessionStore = getStore();
+  app.post('*', async (req, res, next) => {
+    const {
+      sessionId,
+      phoneNumber,
+      serviceCode,
+      networkCode,
+      text
+    } = req.body;
 
-  app.use(session({
-    name: 'tenakata.session',
-    secret: SECRET_KEY,
-    store: sessionStore,
-    cookie: {
-      /**
-       * Session will be expired after maxAge specified.
-       * If rolling is true then maxAge will be counted since session was idle.
-       * It will remove the session from store(redisStore) after maxAge.
-       */
-      maxAge: 31557600000 // milliseconds => 1 Year
-    },
-    rolling: true, // to increase the expiration time of the session cookie for non-idle session
-    resave: false,
-    saveUninitialized: false
-  }));
-}
+    if (sessionId) {
+      let session = await redis.getJSON(sessionId);
+      if (session) {
+        // Session Exists
+        session.step += 1;
+        session.text = text;
+      } else {
+        // Session Does Not Exist, Create One
+        session = {
+          phoneNumber,
+          serviceCode,
+          networkCode,
+          text,
+          step: 1
+        };
+      }
 
-function getStore() {
-  const redisConnect = require('connect-redis')(session);
-  const redisClient = require('../services/redis');
-  return new redisConnect({
-    client: redisClient,
-    logErrors: true
+      await redis.setJSON(sessionId, session);
+      req.session = session;
+    } else {
+      req.session = {
+        step: 1
+      };
+    }
+    next();
   });
 }
