@@ -3,7 +3,8 @@ const express = require('express');
 const registerMorgan = require('./middlewares/morgan');
 const initializeSession = require('./middlewares/session');
 const registerBodyParser = require('./middlewares/bodyParser');
-const responses = require('./response.json');
+const USSDService = require('./services/USSDService');
+const buildStates = require('./buildStates');
 
 const app = express();
 
@@ -11,9 +12,10 @@ registerBodyParser(app);
 initializeSession(app);
 registerMorgan(app);
 
+buildStates();
+
 app.post('*', (req, res) => {
-  const step = req.session.step;
-  const response = responses[`STEP ${step}`];
+  const response = USSDService.run(req);
   return res.send(response || 'You reached the end!!!');
 });
 
