@@ -25,7 +25,8 @@ function initializeSession (app) {
           serviceCode,
           networkCode,
           text,
-          step: 1
+          step: 1,
+          previousState: null
         };
       }
 

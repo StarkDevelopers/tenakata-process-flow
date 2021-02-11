@@ -14,8 +14,8 @@ registerMorgan(app);
 
 buildStates();
 
-app.post('*', (req, res) => {
-  const response = USSDService.run(req);
+app.post('*', async (req, res) => {
+  const response = await USSDService.run(req);
   return res.send(response || 'You reached the end!!!');
 });
 
