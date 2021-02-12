@@ -22,7 +22,7 @@ function buildStates() {
     new USSDMenu()
       .menu('Please Accept the Terms and Conditions available at www.tenakata.com/Privacy.html.')
       .option('1. Yes')
-      .option('1. No')
+      .option('2. No')
       .build(),
     USSDService.__INPUT_TYPES__.EXACT,
     {
