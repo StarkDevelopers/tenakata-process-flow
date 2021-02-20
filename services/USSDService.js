@@ -10,7 +10,11 @@ class USSDService {
     this.__INPUT_TYPES__ = {
       EXACT: 'EXACT',
       REGEX: 'REGEX',
-      DATE: 'DATE'
+      DATE: 'DATE',
+      HANDLER: 'HANDLER'
+    };
+    this.services = {
+      AUTHENTICATION: 'authentication',
     };
   }
 
@@ -27,7 +31,12 @@ class USSDService {
     console.log(`Session: ${sessionId}\nPreviousState: ${previousState}\n`);
 
     try {
-      const state = this.getNextState(previousState, text);
+      let state = this.getNextState(previousState, text);
+
+      // Handle the function if this state has a handler
+      if (state && state.inputType === this.__INPUT_TYPES__.HANDLER) {
+        state = this[state.next.handler]();
+      }
 
       // Save State to Redis-Session
       const session = Object.assign({}, request.session);
@@ -168,6 +177,16 @@ class USSDService {
       next,
       end
     };
+  }
+
+  /**
+   * Authenticate phone number against the server using API
+   * If Authenticated then save required details to REDIS and return AUTHENTICATED State
+   * If not Authenticated then return to UNAUTHENTICATED State
+   */
+  authentication() {
+    // TODO: Handle authentication and return appropriate state...
+    return this.states['AUTHENTICATED'];
   }
 }
 

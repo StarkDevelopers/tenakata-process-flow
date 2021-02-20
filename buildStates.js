@@ -6,6 +6,15 @@ module.exports = buildStates;
 function buildStates() {
   USSDService.state(
     USSDService.__START__,
+    null,
+    USSDService.__INPUT_TYPES__.HANDLER,
+    {
+      handler: USSDService.services.AUTHENTICATION
+    }
+  );
+
+  USSDService.state(
+    'AUTHENTICATED',
     new USSDMenu()
       .menu('Welcome to Tenakata Business App.')
       .setSelectText('Please Reply with your Password?')
