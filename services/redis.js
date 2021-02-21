@@ -1,8 +1,8 @@
 const redis = require('redis');
 
-const REDIS_SERVER = process.env.REDIS_SERVER;
-const REDIS_SERVER_PORT = process.env.REDIS_SERVER_PORT;
-const REDIS_SERVER_AUTH_PASSWORD = process.env.REDIS_SERVER_AUTH_PASSWORD;
+const REDIS_SERVER = process.env.REDIS_SERVER || '127.0.0.1';
+const REDIS_SERVER_PORT = process.env.REDIS_SERVER_PORT || '6379';
+const REDIS_SERVER_AUTH_PASSWORD = process.env.REDIS_SERVER_AUTH_PASSWORD || null;
 
 const auth = {};
 if (REDIS_SERVER_AUTH_PASSWORD) {

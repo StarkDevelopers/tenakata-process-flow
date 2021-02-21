@@ -23,6 +23,8 @@ app.all('*', (req, res) => {
   return res.send('Only POST Method is implemented for this service.');
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`listening on ${process.env.PORT}`);
+let port= process.env.PORT || '8080';
+
+app.listen(port, () => {
+  console.log(`listening on ${port}`);
 });

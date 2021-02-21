@@ -26,6 +26,18 @@ function buildStates() {
     }
   );
 
+
+  USSDService.state(
+    'UNAUTHENTICATED',
+    new USSDMenu()
+      .menu('You have not been registered to use the Tenakata Application.')
+      .setSelectText('Please contact +254728888863 to get Registered.')
+      .build(),
+    null,
+    null,
+    true
+  );
+
   USSDService.state(
     'PRIVACY_POLICY',
     new USSDMenu()
