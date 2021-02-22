@@ -1,14 +1,14 @@
 const moment = require('moment');
 const redis = require('../helpers/redis');
-const axios = require('axios');
-
+const fetch = require('../helpers/request');
+const URLS = require('../helpers/urls');
 
 class USSDService {
   constructor() {
     this.__START__ = '__START__';
     this.states = {};
     this.INVALID_INPUT = 'Invalid input';
-    this.UNEXPECTED_ERROR = 'Unexpected error occured';
+    this.UNEXPECTED_ERROR = 'Unexpected error occurred';
     this.__INPUT_TYPES__ = {
       EXACT: 'EXACT',
       REGEX: 'REGEX',
@@ -16,14 +16,18 @@ class USSDService {
       HANDLER: 'HANDLER'
     };
     this.services = {
+      REGISTRATION_CHECK: 'registrationCheck',
       AUTHENTICATION: 'authentication',
+      FIRST_TIME_USER_CHECK: 'firstTimeUserCheck',
+      SAVE_CASH_CREDIT_SALES_DETAILS: 'saveCashCreditSalesDetails'
     };
   }
 
   async run(request) {
     const {
       text,
-      previousState
+      previousState,
+      ownerName
     } = request.session;
 
     const {
@@ -36,15 +40,24 @@ class USSDService {
       const session = Object.assign({}, request.session);
       let state = this.getNextState(previousState, text);
 
+      // Save user input to Redis-Session
+      if (previousState && this.states[previousState].saveAs) {
+        const saveAs = this.states[previousState].saveAs;
+        if (typeof saveAs === 'string') {
+          session[saveAs] = text.split('*').pop();
+        } else if (typeof saveAs === 'object') {
+          const saveAsName = Object.keys(saveAs)[0];
+          session[saveAsName] = saveAs[saveAsName][text.split('*').pop()];
+        }
+      }
+
       // Handle the function if this state has a handler
-      if (state && state.inputType === this.__INPUT_TYPES__.HANDLER) {
+      while (state && state.inputType === this.__INPUT_TYPES__.HANDLER) {
         state = await this[state.next.handler](request, session);
       }
 
       // Save State to Redis-Session
-
       session.previousState = state.name;
-
       await redis.setJSON(sessionId, session);
 
       if (state.end) {
@@ -52,8 +65,13 @@ class USSDService {
         return this.endResponse(state.response);
       }
 
+      let response = state.response;
+      if (response.includes('[NAME]') && (ownerName || session.ownerName)) {
+        response = response.replace('[NAME]', ownerName || session.ownerName);
+      }
+
       // Return response...
-      return this.continueResponse(state.response);
+      return this.continueResponse(response);
     } catch (error) {
       if (error.type === 'END') {
         console.log(`Session: ${sessionId}\nEND: ${error.endResponse}\n`);
@@ -169,7 +187,7 @@ class USSDService {
     return `END ${response}`;
   }
 
-  state(name, response, inputType, next, end) {
+  state(name, response, inputType, next, saveAs, end) {
     if (this.states[name]) {
       throw new Error(`${name} state already exists!`);
     }
@@ -179,57 +197,94 @@ class USSDService {
       response,
       inputType,
       next,
+      saveAs,
       end
     };
   }
 
   /**
-   * Authenticate phone number against the server using API
-   * If Authenticated then save required details to REDIS and return AUTHENTICATED State
-   * If not Authenticated then return to UNAUTHENTICATED State
+   * Check phone number against the server using API
+   * If Registered then save required details to REDIS and return REGISTERED State
+   * If not Registered then return to NON_REGISTERED State
    */
-  async authentication(request, session) {
-    // TODO: Handle authentication and return appropriate state...
-    const { phoneNumber } = request.body;
-    let countryCode = phoneNumber.substring(1, 4);
-    let contactNumber = phoneNumber.substring(4);
-    let data = '';
-    var config = {
-      method: 'post',
-      url: `http://ec2-18-219-231-177.us-east-2.compute.amazonaws.com/index.php/ussd_login?phone=${contactNumber}&country_code=${countryCode}`,
-      headers: {
-        'x-api-key': 'admin@123'
-      },
-      data: data
-    };
-
-
-    // Calling an API to check phone number is alreay regstered or not
-    // and based on response sending state AUTHENCTICATED/UNAUTHENTICATED
+  async registrationCheck(request, session) {
+    let { phoneNumber } = request.body;
+    const countryCode = phoneNumber.substring(1, 4);
+    phoneNumber = phoneNumber.substring(4);
+    const data = '{}';
 
     try {
-      const response = await axios(config);
-      console.log(response.data)
-      let jsonResponse;
-      if (response.data.toString().indexOf('{') > -1)
-        jsonResponse = JSON.parse(JSON.stringify(response.data.substring(response.data.indexOf('{'))));
-      else
-        jsonResponse = JSON.parse(JSON.stringify(response.data));
+      const authenticationUrl = URLS.AUTHENTICATION.replace('[PHONE_NUMBER]', phoneNumber).replace('[COUNTRY_CODE]', countryCode);
+      const jsonResponse = await fetch(authenticationUrl, 'post', data);
 
       if (jsonResponse.status == 200) {
         session.id = jsonResponse.result.id;
-        session.owner_name = jsonResponse.result.owner_name;
-        session.business_name = jsonResponse.result.business_name;
+        session.ownerName = jsonResponse.result.owner_name;
+        session.businessName = jsonResponse.result.business_name;
         session.password = jsonResponse.result.password;
-        this.states['AUTHENTICATED'].response = `${session.owner_name} ${this.states['AUTHENTICATED'].response}`;
-        return this.states['AUTHENTICATED'];
+        session.status = jsonResponse.result.status;
+        return this.states['REGISTERED'];
       }
-      else
-        return this.states['UNAUTHENTICATED'];
+
+      return this.states['NON_REGISTERED'];
     } catch (error) {
-      console.error("Error occured in authentication", error);
-      this.throwError(this.UNEXPECTED_ERROR)
+      console.error(`Error: Check registered phone number: ${error.stack}`);
+      this.throwError(this.UNEXPECTED_ERROR);
     }
+  }
+
+  async authentication(_, session) {
+    const password = session.text.split('*').pop();
+
+    if (session.password === password) {
+      return this.states['FIRST_TIME_USER_CHECK'];
+    }
+    return this.states['UNAUTHENTICATED'];
+  }
+
+  async firstTimeUserCheck(_, session) {
+    if (session.status === '0') {
+      return this.states['PRIVACY_POLICY'];
+    }
+    return this.states['WELCOME'];
+  }
+
+  async saveCashCreditSalesDetails(_, session) {
+    try {
+      const {
+        phoneNumber,
+        id,
+        menu,
+        subMenu,
+        date,
+        amount,
+        description,
+        details
+      } = session;
+  
+      const data = '{}';
+      const salesUrl = URLS.SALES.replace('[USER_ID]', id)
+        .replace('[SALES_OR_PURCHASE]', menu === 'sales' ? 'sales' : 'purchase')
+        .replace('[DATE]', moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD'))
+        .replace('[AMOUNT]', amount)
+        .replace('[DETAILS]', details)
+        .replace('[PAYMENT_TYPE]', subMenu === 'cash' ? 'cash' : 'credit')
+        .replace('[DESCRIPTION]', description);
+  
+      const jsonResponse = await fetch(salesUrl, 'post', data);
+  
+      console.log(`Response: Save Cash Credit Sales Details: ${JSON.stringify(jsonResponse)}`);
+
+      if (jsonResponse.status === 200) {
+        return this.states['SALES_DETAILS_SAVED'];
+      }
+
+      return this.states['SALES_DETAILS_FAILED'];
+    } catch (error) {
+      console.error(`Error: Save Cash Credit Sales Details: ${error.stack}`);
+      this.throwError(this.UNEXPECTED_ERROR);
+    }
+    
   }
 }
 

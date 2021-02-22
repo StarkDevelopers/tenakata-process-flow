@@ -9,30 +9,61 @@ function buildStates() {
     null,
     USSDService.__INPUT_TYPES__.HANDLER,
     {
-      handler: USSDService.services.AUTHENTICATION
+      handler: USSDService.services.REGISTRATION_CHECK
     }
   );
 
   USSDService.state(
-    'AUTHENTICATED',
+    'REGISTERED',
     new USSDMenu()
-      .menu('Welcome to Tenakata Business App.')
+      .menu('[NAME], Welcome to Tenakata Business App.')
       .setSelectText('Please Reply with your Password?')
       .build(),
     USSDService.__INPUT_TYPES__.REGEX,
     {
       regex: '^.+$',
-      state: 'PRIVACY_POLICY'
+      state: 'AUTHENTICATION'
     }
   );
 
+  USSDService.state(
+    'AUTHENTICATION',
+    null,
+    USSDService.__INPUT_TYPES__.HANDLER,
+    {
+      handler: USSDService.services.AUTHENTICATION
+    }
+  );
 
   USSDService.state(
     'UNAUTHENTICATED',
     new USSDMenu()
+      .menu('You have entered a wrong password.')
+      .setSelectText('Please Enter your password again?')
+      .build(),
+    USSDService.__INPUT_TYPES__.REGEX,
+    {
+      regex: '^.+$',
+      state: 'AUTHENTICATION'
+    }
+  );
+
+  USSDService.state(
+    'FIRST_TIME_USER_CHECK',
+    null,
+    USSDService.__INPUT_TYPES__.HANDLER,
+    {
+      handler: USSDService.services.FIRST_TIME_USER_CHECK
+    }
+  );
+
+  USSDService.state(
+    'NON_REGISTERED',
+    new USSDMenu()
       .menu('You have not been registered to use the Tenakata Application.')
       .setSelectText('Please contact +254728888863 to get Registered.')
       .build(),
+    null,
     null,
     null,
     true
@@ -57,6 +88,7 @@ function buildStates() {
     new USSDMenu()
       .menu('Thank you. We are unable to complete your registration')
       .build(),
+    null,
     null,
     null,
     true
@@ -95,6 +127,16 @@ function buildStates() {
       '4': 'TRAINING',
       '5': 'LOANS',
       '6': 'STOCK_PURCHASE'
+    },
+    {
+      'menu': {
+        1: 'sales',
+        2: 'moneyOut',
+        3: 'reports',
+        4: 'training',
+        5: 'loans',
+        6: 'stockPurchase',
+      }
     }
   );
 
@@ -111,6 +153,13 @@ function buildStates() {
       '1': 'SALES_DETAILS_DATE',
       '2': 'SALES_DETAILS_DATE',
       '3': 'WELCOME'
+    },
+    {
+      'subMenu': {
+        1: 'cash',
+        2: 'creditSale',
+        3: 'back'
+      }
     }
   );
 
@@ -122,7 +171,8 @@ function buildStates() {
     USSDService.__INPUT_TYPES__.DATE,
     {
       'DATE': 'SALES_DETAILS_AMOUNT'
-    }
+    },
+    'date'
   );
 
   USSDService.state(
@@ -134,7 +184,8 @@ function buildStates() {
     {
       regex: '^\\d+$',
       state: 'SALES_DETAILS_DESCRIPTION'
-    }
+    },
+    'amount'
   );
 
   USSDService.state(
@@ -144,9 +195,10 @@ function buildStates() {
       .build(),
     USSDService.__INPUT_TYPES__.REGEX,
     {
-      regex: '^[\\w\\s]+$',
+      regex: '^[\\w\\s\\W]+$',
       state: 'SALES_DETAILS_DETAILS'
-    }
+    },
+    'description'
   );
 
   USSDService.state(
@@ -156,16 +208,38 @@ function buildStates() {
       .build(),
     USSDService.__INPUT_TYPES__.REGEX,
     {
-      regex: '^[\\w\\s]+$',
-      state: 'SALES_DETAILS_SAVED'
+      regex: '^[\\w\\s\\W]+$',
+      state: 'SAVE_SALES_DETAILS'
+    },
+    'details'
+  );
+
+  USSDService.state(
+    'SAVE_SALES_DETAILS',
+    null,
+    USSDService.__INPUT_TYPES__.HANDLER,
+    {
+      handler: USSDService.services.SAVE_CASH_CREDIT_SALES_DETAILS
     }
   );
 
   USSDService.state(
     'SALES_DETAILS_SAVED',
     new USSDMenu()
-      .menu('Saved Sales Details')
+      .menu('Sales Details Saved.')
       .build(),
+    null,
+    null,
+    null,
+    true
+  );
+
+  USSDService.state(
+    'SALES_DETAILS_FAILED',
+    new USSDMenu()
+      .menu('Failed to save Sales Details.')
+      .build(),
+    null,
     null,
     null,
     true
