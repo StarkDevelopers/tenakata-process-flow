@@ -2,13 +2,11 @@ const axios = require('axios');
 
 const API_ENDPOINT = process.env.API_ENDPOINT;
 
-module.exports = async (path, method, body) => {
+module.exports = async (path, method, body, headers) => {
   const config = {
     method,
     url: `${API_ENDPOINT}${path}`,
-    headers: {
-      'x-api-key': 'admin@123'
-    },
+    headers,
     data: body
   };
 

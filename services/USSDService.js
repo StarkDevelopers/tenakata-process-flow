@@ -213,9 +213,13 @@ class USSDService {
     phoneNumber = phoneNumber.substring(4);
     const data = '{}';
 
+    const headers = {
+      'x-api-key': 'admin@123'
+    };
+
     try {
       const authenticationUrl = URLS.AUTHENTICATION.replace('[PHONE_NUMBER]', phoneNumber).replace('[COUNTRY_CODE]', countryCode);
-      const jsonResponse = await fetch(authenticationUrl, 'post', data);
+      const jsonResponse = await fetch(authenticationUrl, 'post', data, headers);
 
       if (jsonResponse.status == 200) {
         session.id = jsonResponse.result.id;
@@ -223,6 +227,7 @@ class USSDService {
         session.businessName = jsonResponse.result.business_name;
         session.password = jsonResponse.result.password;
         session.status = jsonResponse.result.status;
+        session.token = jsonResponse.result.token;
         return this.states['REGISTERED'];
       }
 
@@ -259,7 +264,8 @@ class USSDService {
         date,
         amount,
         description,
-        details
+        details,
+        token
       } = session;
   
       const data = '{}';
@@ -270,12 +276,17 @@ class USSDService {
         .replace('[DETAILS]', details)
         .replace('[PAYMENT_TYPE]', subMenu === 'cash' ? 'cash' : 'credit')
         .replace('[DESCRIPTION]', description);
+
+      const headers = {
+        'x-api-key': 'admin@123',
+        token
+      };
   
-      const jsonResponse = await fetch(salesUrl, 'post', data);
+      const jsonResponse = await fetch(salesUrl, 'post', data, headers);
   
       console.log(`Response: Save Cash Credit Sales Details: ${JSON.stringify(jsonResponse)}`);
 
-      if (jsonResponse.status === 200) {
+      if (jsonResponse.status == 200) {
         return this.states['SALES_DETAILS_SAVED'];
       }
 
