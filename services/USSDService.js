@@ -221,6 +221,10 @@ class USSDService {
       const authenticationUrl = URLS.AUTHENTICATION.replace('[PHONE_NUMBER]', phoneNumber).replace('[COUNTRY_CODE]', countryCode);
       const jsonResponse = await fetch(authenticationUrl, 'post', data, headers);
 
+      if (typeof jsonResponse !== 'object') {
+        jsonResponse = JSON.parse(jsonResponse);
+      }
+
       if (jsonResponse.status == 200) {
         session.id = jsonResponse.result.id;
         session.ownerName = jsonResponse.result.owner_name;
