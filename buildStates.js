@@ -78,7 +78,7 @@ function buildStates() {
       .build(),
     USSDService.__INPUT_TYPES__.EXACT,
     {
-      '1': 'PRIVACY_POLICY_YES',
+      '1': 'WELCOME',
       '2': 'PRIVACY_POLICY_NO'
     }
   );
@@ -92,19 +92,6 @@ function buildStates() {
     null,
     null,
     true
-  );
-
-  USSDService.state(
-    'PRIVACY_POLICY_YES',
-    new USSDMenu()
-      .menu('Thank you for Successfully Signin to Tenakata Business App.')
-      .setSelectText('Please Choose your Password or PIN to access the application:')
-      .build(),
-    USSDService.__INPUT_TYPES__.REGEX,
-    {
-      regex: '^.+$',
-      state: 'WELCOME'
-    }
   );
 
   USSDService.state(
