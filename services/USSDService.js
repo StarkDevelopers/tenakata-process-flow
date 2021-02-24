@@ -265,6 +265,7 @@ class USSDService {
         id,
         menu,
         subMenu,
+        cashDateSelection,
         date,
         amount,
         description,
@@ -273,9 +274,11 @@ class USSDService {
       } = session;
 
       const data = '{}';
+      let cashDate;
+      cashDateSelection == 1 ? cashDate = moment().format('YYYY-MM-DD') : cashDate = moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD');
       const salesUrl = URLS.SALES.replace('[USER_ID]', id)
         .replace('[SALES_OR_PURCHASE]', menu === 'sales' ? 'sales' : 'purchase')
-        .replace('[DATE]', moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD'))
+        .replace('[DATE]',cashDate)
         .replace('[AMOUNT]', amount)
         .replace('[DETAILS]', details)
         .replace('[PAYMENT_TYPE]', subMenu === 'cash' ? 'cash' : 'credit')

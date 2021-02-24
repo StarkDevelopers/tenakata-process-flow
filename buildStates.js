@@ -161,7 +161,8 @@ function buildStates() {
     {
       '1': 'SALES_DETAILS_AMOUNT',
       '2': 'SALES_DETAILS_DATE'
-    }
+    },
+    'cashDateSelection'
   );
 
 
@@ -256,7 +257,7 @@ function buildStates() {
   USSDService.state(
     'END',
     new USSDMenu()
-      .menu('We are ending this session. Thanks.')
+      .menu('Thanks for using Tenakata Business App.')
       .build(),
     null,
     null,
