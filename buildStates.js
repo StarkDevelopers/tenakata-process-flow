@@ -97,7 +97,7 @@ function buildStates() {
   USSDService.state(
     'WELCOME',
     new USSDMenu()
-      .menu('Welcome to Tenakata Business Application.')
+      .menu('Please select a Transaction.')
       .setSelectText('Please select:')
       .option('1. Sales')
       .option('2. Money Out')
@@ -137,7 +137,7 @@ function buildStates() {
       .build(),
     USSDService.__INPUT_TYPES__.EXACT,
     {
-      '1': 'SALES_DETAILS_DATE',
+      '1': 'CASH_DATE_SELECTION',
       '2': 'SALES_DETAILS_DATE',
       '3': 'WELCOME'
     },
@@ -151,13 +151,30 @@ function buildStates() {
   );
 
   USSDService.state(
+    'CASH_DATE_SELECTION',
+    new USSDMenu()
+      .menu('Selece')
+      .option('1.Today')
+      .option('2.Other Dates')
+      .build(),
+    USSDService.__INPUT_TYPES__.EXACT,
+    {
+      '1': 'SALES_DETAILS_AMOUNT',
+      '2': 'SALES_DETAILS_DATE'
+    }
+  );
+
+
+
+  USSDService.state(
     'SALES_DETAILS_DATE',
     new USSDMenu()
       .menu('Enter Date[DDMMYYYY]')
       .build(),
     USSDService.__INPUT_TYPES__.DATE,
     {
-      'DATE': 'SALES_DETAILS_AMOUNT'
+      'VALID_DATE': 'SALES_DETAILS_AMOUNT',
+      'INVALID_DATE': 'CASH_DATE_SELECTION'
     },
     'date'
   );
@@ -214,6 +231,20 @@ function buildStates() {
     'SALES_DETAILS_SAVED',
     new USSDMenu()
       .menu('Sales Details Saved.')
+      .option('1.Continue')
+      .option('2.Exit')
+      .build(),
+    USSDService.__INPUT_TYPES__.EXACT,
+    {
+      '1': 'WELCOME',
+      '2': 'END'
+    }
+  );
+
+  USSDService.state(
+    'SALES_DETAILS_FAILED',
+    new USSDMenu()
+      .menu('Failed to save Sales Details.')
       .build(),
     null,
     null,
@@ -221,10 +252,11 @@ function buildStates() {
     true
   );
 
+
   USSDService.state(
-    'SALES_DETAILS_FAILED',
+    'END',
     new USSDMenu()
-      .menu('Failed to save Sales Details.')
+      .menu('We are ending this session. Thanks.')
       .build(),
     null,
     null,

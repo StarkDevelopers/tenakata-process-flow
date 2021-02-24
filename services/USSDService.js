@@ -162,14 +162,14 @@ class USSDService {
     const regex = '^\\d{8}$';
 
     if (!(new RegExp(regex, 'g')).exec(part)) {
-      return this.throwError('Invalid Date');
+      return state.next['INVALID_DATE'];
     }
 
     if (!moment(part, 'DDMMYYYY', true).isValid()) {
-      return this.throwError('Invalid Date');
+      return state.next['INVALID_DATE'];
     }
 
-    return state.next['DATE'];
+    return state.next['VALID_DATE'];
   }
 
   throwError(response = this.INVALID_INPUT) {
@@ -271,7 +271,7 @@ class USSDService {
         details,
         token
       } = session;
-  
+
       const data = '{}';
       const salesUrl = URLS.SALES.replace('[USER_ID]', id)
         .replace('[SALES_OR_PURCHASE]', menu === 'sales' ? 'sales' : 'purchase')
@@ -285,9 +285,9 @@ class USSDService {
         'x-api-key': 'admin@123',
         token
       };
-  
+
       const jsonResponse = await fetch(salesUrl, 'post', data, headers);
-  
+
       console.log(`Response: Save Cash Credit Sales Details: ${JSON.stringify(jsonResponse)}`);
 
       if (jsonResponse.status == 200) {
@@ -299,7 +299,7 @@ class USSDService {
       console.error(`Error: Save Cash Credit Sales Details: ${error.stack}`);
       this.throwError(this.UNEXPECTED_ERROR);
     }
-    
+
   }
 }
 
