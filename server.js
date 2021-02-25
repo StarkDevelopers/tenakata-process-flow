@@ -4,15 +4,13 @@ const registerMorgan = require('./middlewares/morgan');
 const initializeSession = require('./middlewares/session');
 const registerBodyParser = require('./middlewares/bodyParser');
 const USSDService = require('./services/USSDService');
-const buildStates = require('./buildStates');
+require('./buildStates');
 
 const app = express();
 
 registerBodyParser(app);
 initializeSession(app);
 registerMorgan(app);
-
-buildStates();
 
 app.post('*', async (req, res) => {
   const response = await USSDService.run(req);

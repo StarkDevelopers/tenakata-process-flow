@@ -19,7 +19,8 @@ class USSDService {
       REGISTRATION_CHECK: 'registrationCheck',
       AUTHENTICATION: 'authentication',
       FIRST_TIME_USER_CHECK: 'firstTimeUserCheck',
-      SAVE_CASH_CREDIT_SALES_DETAILS: 'saveCashCreditSalesDetails'
+      SAVE_CASH_CREDIT_SALES_DETAILS: 'saveCashCreditSalesDetails',
+      SAVE_CASH_MONEY_OUT_DETAILS: 'saveCashMoneyOutDetails',
     };
   }
 
@@ -248,6 +249,16 @@ class USSDService {
     if (session.password === password) {
       return this.states['FIRST_TIME_USER_CHECK'];
     }
+
+    if (session.retryCount === 3) {
+      return this.states['MAX_RETRY_EXCEEDED'];
+    } else {
+      if (!session.retryCount) {
+        session.retryCount = 0;
+      }
+      session.retryCount += 1;
+    }
+
     return this.states['UNAUTHENTICATED'];
   }
 
@@ -261,9 +272,7 @@ class USSDService {
   async saveCashCreditSalesDetails(_, session) {
     try {
       const {
-        phoneNumber,
         id,
-        menu,
         subMenu,
         cashDateSelection,
         date,
@@ -275,9 +284,9 @@ class USSDService {
 
       const data = '{}';
       let cashDate;
-      cashDateSelection == 1 ? cashDate = moment().format('YYYY-MM-DD') : cashDate = moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD');
+      cashDate = cashDateSelection == 1 ? moment().format('YYYY-MM-DD') : moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD');
       const salesUrl = URLS.SALES.replace('[USER_ID]', id)
-        .replace('[SALES_OR_PURCHASE]', menu === 'sales' ? 'sales' : 'purchase')
+        .replace('[SALES_OR_PURCHASE]', 'sales')
         .replace('[DATE]',cashDate)
         .replace('[AMOUNT]', amount)
         .replace('[DETAILS]', details)
@@ -300,6 +309,53 @@ class USSDService {
       return this.states['SALES_DETAILS_FAILED'];
     } catch (error) {
       console.error(`Error: Save Cash Credit Sales Details: ${error.stack}`);
+      this.throwError(this.UNEXPECTED_ERROR);
+    }
+
+  }
+
+  async saveCashMoneyOutDetails(_, session) {
+    try {
+      const {
+        id,
+        subMenu,
+        cashDateSelection,
+        date,
+        amount,
+        description,
+        descriptionType,
+        details,
+        token
+      } = session;
+
+      const data = '{}';
+      let cashDate;
+      cashDate = cashDateSelection == 1 ? moment().format('YYYY-MM-DD') : moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD');
+      const salesUrl = URLS.MONEY_OUT.replace('[USER_ID]', id)
+        .replace('[SALES_OR_PURCHASE]', 'purchase')
+        .replace('[DATE]',cashDate)
+        .replace('[AMOUNT]', amount)
+        .replace('[DETAILS]', details)
+        .replace('[PAYMENT_TYPE]', subMenu === 'cash' ? 'cash' : 'credit')
+        .replace('[DESCRIPTION]', description)
+        .replace('[DESCRIPTION_TYPE]', descriptionType);
+
+      const headers = {
+        'x-api-key': 'admin@123',
+        token
+      };
+
+      const jsonResponse = await fetch(salesUrl, 'post', data, headers);
+
+      console.log(`Response: Save Cash Money Out Details: ${JSON.stringify(jsonResponse)}`);
+
+      if (jsonResponse.status == 200) {
+        return this.states['MONEY_OUT_DETAILS_SAVED'];
+      }
+
+      return this.states['MONEY_OUT_DETAILS_FAILED'];
+    } catch (error) {
+      console.error(`Error: Save Cash Money Out Details: ${error.stack}`);
       this.throwError(this.UNEXPECTED_ERROR);
     }
 
