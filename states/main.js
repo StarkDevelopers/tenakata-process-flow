@@ -13,8 +13,10 @@ USSDService.state(
 USSDService.state(
   'REGISTERED',
   new USSDMenu()
-    .menu('[NAME], Welcome to Tenakata Business App.')
+    .menu('[NAME], Welcome to Tenakata.')
     .setSelectText('Please Reply with your Password?')
+    .setSelectText('')
+    .setSelectText('Forgot Password? Call +254728888863.')
     .build(),
   USSDService.__INPUT_TYPES__.REGEX,
   {
@@ -106,32 +108,33 @@ USSDService.state(
 USSDService.state(
   'WELCOME',
   new USSDMenu()
-    .menu('Please select a Transaction.')
-    .setSelectText('Please select:')
+    .menu('Please select option.')
     .option('1. Sales')
     .option('2. Money Out')
-    .option('3. Reports')
-    .option('4. Training')
-    .option('5. Loans')
-    .option('6. Stock Purchase')
+    // .option('3. Reports')
+    // .option('4. Training')
+    // .option('5. Loans')
+    // .option('6. Stock Purchase')
+    .option('0. Exit')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
     '1': 'SALES',
     '2': 'MONEY_OUT',
-    '3': 'REPORTS',
-    '4': 'TRAINING',
-    '5': 'LOANS',
-    '6': 'STOCK_PURCHASE'
+    // '3': 'REPORTS',
+    // '4': 'TRAINING',
+    // '5': 'LOANS',
+    // '6': 'STOCK_PURCHASE',
+    '0': 'END'
   },
   {
     'menu': {
       1: 'sales',
       2: 'moneyOut',
-      3: 'reports',
-      4: 'training',
-      5: 'loans',
-      6: 'stockPurchase',
+      // 3: 'reports',
+      // 4: 'training',
+      // 5: 'loans',
+      // 6: 'stockPurchase',
     }
   }
 );

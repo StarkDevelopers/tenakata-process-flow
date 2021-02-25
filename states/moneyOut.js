@@ -6,20 +6,20 @@ USSDService.state(
   new USSDMenu()
     .menu('Select')
     .option('1. Cash')
-    .option('2. Credit')
-    .option('3. Back')
+    // .option('2. Credit')
+    .option('0. Back')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
     '1': 'MONEY_OUT_DATE_SELECTION',
-    '2': '',
-    '3': 'WELCOME'
+    // '2': '',
+    '0': 'WELCOME'
   },
   {
     'subMenu': {
       1: 'cash',
-      2: 'creditSale',
-      3: 'back'
+      // 2: 'creditSale',
+      0: 'back'
     }
   }
 );
@@ -27,9 +27,9 @@ USSDService.state(
 USSDService.state(
   'MONEY_OUT_DATE_SELECTION',
   new USSDMenu()
-    .menu('Select')
-    .option('1.Today')
-    .option('2.Other Dates')
+    .menu('Select Transaction Date')
+    .option('1. Today')
+    .option('2. Other Dates')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
@@ -42,7 +42,7 @@ USSDService.state(
 USSDService.state(
   'MONEY_OUT_DETAILS_DATE',
   new USSDMenu()
-    .menu('Enter Date[DDMMYYYY]')
+    .menu('Enter Date in the format DDMMYYYY (e.g. 25022021)')
     .build(),
   USSDService.__INPUT_TYPES__.DATE,
   {
@@ -55,7 +55,7 @@ USSDService.state(
 USSDService.state(
   'MONEY_OUT_DETAILS_AMOUNT',
   new USSDMenu()
-    .menu('Enter The Amount in KES')
+    .menu('Enter Amount in KES')
     .build(),
   USSDService.__INPUT_TYPES__.REGEX,
   {
@@ -68,7 +68,7 @@ USSDService.state(
 USSDService.state(
   'MONEY_OUT_DETAILS_DESCRIPTION',
   new USSDMenu()
-    .menu('Enter Description')
+    .menu('Enter Description (Example: Purchase for 25022021)')
     .build(),
   USSDService.__INPUT_TYPES__.REGEX,
   {
@@ -113,7 +113,7 @@ USSDService.state(
 USSDService.state(
   'MONEY_OUT_DETAILS_DETAILS',
   new USSDMenu()
-    .menu('Details')
+    .menu('Details (Example: Jeans 500)')
     .build(),
   USSDService.__INPUT_TYPES__.REGEX,
   {
@@ -135,14 +135,14 @@ USSDService.state(
 USSDService.state(
   'MONEY_OUT_DETAILS_SAVED',
   new USSDMenu()
-    .menu('Money Out Details Saved.')
-    .option('1.Continue')
-    .option('2.Exit')
+    .menu('Purchase Details Saved.')
+    .option('1. Continue')
+    .option('0. Exit')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
     '1': 'WELCOME',
-    '2': 'END'
+    '0': 'END'
   }
 );
 

@@ -1,7 +1,7 @@
 class USSDMenu {
   constructor(menuText = '', selectText = '', ...menuOptions) {
     this.menuText = menuText;
-    this.selectText = selectText;
+    this.selectText = selectText || [];
     this.menuOptions = menuOptions || [];
   }
 
@@ -11,7 +11,7 @@ class USSDMenu {
   }
 
   setSelectText(selectText) {
-    this.selectText = selectText;
+    this.selectText.push(selectText);
     return this;
   }
 
@@ -23,8 +23,9 @@ class USSDMenu {
   build() {
     let menuString = this.menuText;
 
-    if (this.selectText) {
-      menuString += `\n${this.selectText}`;
+    if (this.selectText.length) {
+      menuString += '\n';
+      menuString += this.selectText.join('\n');
     }
 
     if (this.menuOptions.length) {

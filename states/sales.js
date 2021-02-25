@@ -6,20 +6,20 @@ USSDService.state(
   new USSDMenu()
     .menu('Select')
     .option('1. Cash')
-    .option('2. Credit Sale')
-    .option('3. Back')
+    // .option('2. Credit Sale')
+    .option('0. Back')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
     '1': 'SALES_DATE_SELECTION',
-    '2': 'SALES_DETAILS_DATE',
-    '3': 'WELCOME'
+    // '2': 'SALES_DETAILS_DATE',
+    '0': 'WELCOME'
   },
   {
     'subMenu': {
       1: 'cash',
-      2: 'creditSale',
-      3: 'back'
+      // 2: 'creditSale',
+      0: 'back'
     }
   }
 );
@@ -27,9 +27,9 @@ USSDService.state(
 USSDService.state(
   'SALES_DATE_SELECTION',
   new USSDMenu()
-    .menu('Select')
-    .option('1.Today')
-    .option('2.Other Dates')
+    .menu('Select Transaction Date')
+    .option('1. Today')
+    .option('2. Other Dates')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
@@ -42,7 +42,7 @@ USSDService.state(
 USSDService.state(
   'SALES_DETAILS_DATE',
   new USSDMenu()
-    .menu('Enter Date[DDMMYYYY]')
+    .menu('Enter Date in the format DDMMYYYY (e.g. 25022021)')
     .build(),
   USSDService.__INPUT_TYPES__.DATE,
   {
@@ -55,7 +55,7 @@ USSDService.state(
 USSDService.state(
   'SALES_DETAILS_AMOUNT',
   new USSDMenu()
-    .menu('Enter The Amount in KES')
+    .menu('Enter Amount in KES')
     .build(),
   USSDService.__INPUT_TYPES__.REGEX,
   {
@@ -68,7 +68,7 @@ USSDService.state(
 USSDService.state(
   'SALES_DETAILS_DESCRIPTION',
   new USSDMenu()
-    .menu('Enter Description')
+    .menu('Enter Description (Example: Sales for 25022021)')
     .build(),
   USSDService.__INPUT_TYPES__.REGEX,
   {
@@ -81,7 +81,7 @@ USSDService.state(
 USSDService.state(
   'SALES_DETAILS_DETAILS',
   new USSDMenu()
-    .menu('Details')
+    .menu('Details (Example: Jeans 500)')
     .build(),
   USSDService.__INPUT_TYPES__.REGEX,
   {
@@ -104,13 +104,13 @@ USSDService.state(
   'SALES_DETAILS_SAVED',
   new USSDMenu()
     .menu('Sales Details Saved.')
-    .option('1.Continue')
-    .option('2.Exit')
+    .option('1. Continue')
+    .option('0. Exit')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
     '1': 'WELCOME',
-    '2': 'END'
+    '0': 'END'
   }
 );
 
