@@ -220,7 +220,7 @@ class USSDService {
 
     try {
       const authenticationUrl = URLS.AUTHENTICATION.replace('[PHONE_NUMBER]', phoneNumber).replace('[COUNTRY_CODE]', countryCode);
-      const jsonResponse = await fetch(authenticationUrl, 'post', data, headers);
+      let jsonResponse = await fetch(authenticationUrl, 'post', data, headers);
 
       if (typeof jsonResponse !== 'object') {
         jsonResponse = JSON.parse(jsonResponse);
