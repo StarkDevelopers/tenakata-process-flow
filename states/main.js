@@ -111,31 +111,57 @@ USSDService.state(
     .menu('Please select option.')
     .option('1. Sales')
     .option('2. Money Out')
-    // .option('3. Reports')
-    // .option('4. Training')
-    // .option('5. Loans')
-    // .option('6. Stock Purchase')
+    .option('3. Reports')
+    .option('4. Refer a Friend')
+    .option('5. Terms and Conditions')
     .option('0. Exit')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
     '1': 'SALES',
     '2': 'MONEY_OUT',
-    // '3': 'REPORTS',
-    // '4': 'TRAINING',
-    // '5': 'LOANS',
-    // '6': 'STOCK_PURCHASE',
+    '3': 'REPORTS',
+    '4': 'REFER_A_FRIEND',
+    '5': 'TERMS_AND_CONDITIONS',
     '0': 'END'
   },
   {
     'menu': {
       1: 'sales',
       2: 'moneyOut',
-      // 3: 'reports',
-      // 4: 'training',
-      // 5: 'loans',
-      // 6: 'stockPurchase',
+      3: 'reports',
+      4: 'referAFriend',
+      5: 'termsAndConditions',
     }
+  }
+);
+
+USSDService.state(
+  'REFER_A_FRIEND',
+  new USSDMenu()
+    .setSelectText('Please reply with your Friends Mobile Number: (Example 070012345678)')
+    .setSelectText('Please reply with your Friends Name (Example Sebie Salim)')
+    .setEndText('Thank you for Refering a Friend. An SMS will be sent to them and followup done by Tenakata Officers.')
+    .setEndText('Press 1 to return to main menu.')
+    .build(),
+  USSDService.__INPUT_TYPES__.EXACT,
+  {
+    '1': 'WELCOME'
+    // '2': 'PRIVACY_POLICY_NO'
+  }
+);
+
+
+USSDService.state(
+  'TERMS_AND_CONDITIONS',
+  new USSDMenu()
+    .menu('An SMS Message will be sent to your Phone with the Terms and Conditions')
+    .setSelectText('Press 1 to return to main menu.')
+    .build(),
+  USSDService.__INPUT_TYPES__.EXACT,
+  {
+    '1': 'WELCOME'
+  //   // '2': 'PRIVACY_POLICY_NO'
   }
 );
 
