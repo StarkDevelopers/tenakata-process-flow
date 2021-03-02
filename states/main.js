@@ -121,7 +121,7 @@ USSDService.state(
     '1': 'SALES',
     '2': 'MONEY_OUT',
     '3': 'REPORTS',
-    '4': 'REFER_A_FRIEND',
+    '4': 'REFER_A_FRIEND_MOBILE_NUMBER',
     '5': 'TERMS_AND_CONDITIONS',
     '0': 'END'
   },
@@ -136,20 +136,7 @@ USSDService.state(
   }
 );
 
-USSDService.state(
-  'REFER_A_FRIEND',
-  new USSDMenu()
-    .setSelectText('Please reply with your Friends Mobile Number: (Example 070012345678)')
-    .setSelectText('Please reply with your Friends Name (Example Sebie Salim)')
-    .setEndText('Thank you for Refering a Friend. An SMS will be sent to them and followup done by Tenakata Officers.')
-    .setEndText('Press 1 to return to main menu.')
-    .build(),
-  USSDService.__INPUT_TYPES__.EXACT,
-  {
-    '1': 'WELCOME'
-    // '2': 'PRIVACY_POLICY_NO'
-  }
-);
+
 
 
 USSDService.state(
