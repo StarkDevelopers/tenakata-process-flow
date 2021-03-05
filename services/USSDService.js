@@ -21,6 +21,8 @@ class USSDService {
       FIRST_TIME_USER_CHECK: 'firstTimeUserCheck',
       SAVE_CASH_CREDIT_SALES_DETAILS: 'saveCashCreditSalesDetails',
       SAVE_CASH_MONEY_OUT_DETAILS: 'saveCashMoneyOutDetails',
+      SEND_REPORT_MESSAGE: 'sendReportMessage',
+      MOVE_TO_SEND_REPORT_SMS_STATE: 'moveToSendReportSMSStage'
     };
   }
 
@@ -359,6 +361,27 @@ class USSDService {
       this.throwError(this.UNEXPECTED_ERROR);
     }
 
+  }
+
+  //################ Report related functions #################//
+
+  async sendReportMessage(_, session) {
+    try {
+      //Based on previous state use API URL
+      console.log(session.previousState);
+      // Parameter of which time range user wants reports. Today, Weekly or Monthly.
+      console.log(session.reportTimeRange)
+      return this.states['WILL_SEND_TEXT_MESSAGE']
+    }
+    catch (error) {
+      console.error(`Error: Sending Message of Expenses Report: ${error.stack}`);
+      this.throwError(this.UNEXPECTED_ERROR);
+    }
+  }
+
+  async moveToSendReportSMSStage(_, session) {
+    
+    return this.states['SEND_REPORT_MESSAGE'];
   }
 }
 

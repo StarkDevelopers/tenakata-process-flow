@@ -1,6 +1,20 @@
 const USSDService = require('../services/USSDService');
 const USSDMenu = require('../services/USSDMenu');
 
+const nextStates = {
+    '1': 'SEND_REPORT_MESSAGE',
+    '2': 'SEND_REPORT_MESSAGE',
+    '3': 'SEND_REPORT_MESSAGE',
+    '0': 'REPORTS'
+}
+
+const saveAsReportValue = {
+    'reportTimeRange': {
+        1: 'Today',
+        2: 'Weekly',
+        3: 'Monthly'
+    }
+}
 USSDService.state(
     'REPORTS',
     new USSDMenu()
@@ -34,46 +48,29 @@ USSDService.state(
         .option('2. Weekly Profit')
         .option('3. Monthly Profit')
         .option('0. Back')
-        .setEndText('An SMS with profit will be sent to your phone. Thank you. Reply with 1 to continue or 0 to Exit.')
         .build(),
     USSDService.__INPUT_TYPES__.EXACT,
-    {
-        // '1': 'SALES_DETAILS_AMOUNT',
-        '0': 'REPORTS'
-    }
+    nextStates,
+    saveAsReportValue
 );
 
 
-
-//TODO: API CALL HERE
 USSDService.state(
     'PEOPLE_WHO_OWE_ME_MONEY',
-    new USSDMenu()
-        .menu('Please select Option:')
-        .option('0. Back')
-        .setEndText('An SMS with profit will be sent to your phone. Thank you. Reply with 1 to continue or 0 to Exit.')
-        .build(),
-    USSDService.__INPUT_TYPES__.EXACT,
+    null,
+    USSDService.__INPUT_TYPES__.HANDLER,
     {
-        // '1': 'SALES_DETAILS_AMOUNT',
-        '0': 'REPORTS'
+        handler: USSDService.services.MOVE_TO_SEND_REPORT_SMS_STATE
     }
 );
 
-
-//TODO: API CALL HERE
+ 
 USSDService.state(
     'PEOPLE_I_OWE_MONEY',
-    new USSDMenu()
-        .menu('Please select Option:')
-        .option('1. ')
-        .option('0. Back')
-        .setEndText('Thank you. Reply with 1 to continue or 0 to Exit.')
-        .build(),
-    USSDService.__INPUT_TYPES__.EXACT,
+    null,
+    USSDService.__INPUT_TYPES__.HANDLER,
     {
-        // '1': 'SALES_DETAILS_AMOUNT',
-        '0': 'REPORTS'
+        handler: USSDService.services.MOVE_TO_SEND_REPORT_SMS_STATE
     }
 );
 
@@ -85,13 +82,10 @@ USSDService.state(
         .option('2. Weekly Sales')
         .option('3. Monthly Sales')
         .option('0. Back')
-        .setEndText('An SMS with sales details will be sent to your phone.Thank you. Reply with 1 to continue or 0 to Exit.')
         .build(),
     USSDService.__INPUT_TYPES__.EXACT,
-    {
-        // '1': 'SALES_DETAILS_AMOUNT',
-        '0': 'REPORTS'
-    }
+    nextStates,
+    saveAsReportValue
 );
 
 
@@ -103,13 +97,10 @@ USSDService.state(
         .option('2. Weekly Stocks')
         .option('3. Monthly Stocks')
         .option('0. Back')
-        .setEndText('An SMS with stocks details will be sent to your phone.Thank you. Reply with 1 to continue or 0 to Exit.')
         .build(),
     USSDService.__INPUT_TYPES__.EXACT,
-    {
-        // '1': 'SALES_DETAILS_AMOUNT',
-        '0': 'REPORTS'
-    }
+    nextStates,
+    saveAsReportValue
 );
 
 USSDService.state(
@@ -120,11 +111,34 @@ USSDService.state(
         .option('2. Weekly Expenses')
         .option('3. Monthly Expenses')
         .option('0. Back')
-        .setEndText('An SMS with expenses details will be sent to your phone.Thank you. Reply with 1 to continue or 0 to Exit.')
+        .build(),
+    USSDService.__INPUT_TYPES__.EXACT,
+    nextStates,
+    saveAsReportValue
+);
+
+
+USSDService.state(
+    'SEND_REPORT_MESSAGE',
+    null,
+    USSDService.__INPUT_TYPES__.HANDLER,
+    {
+        handler: USSDService.services.SEND_REPORT_MESSAGE
+    }
+);
+
+
+
+USSDService.state(
+    'WILL_SEND_TEXT_MESSAGE',
+    new USSDMenu()
+        .setSelectText('An SMS with required details will be sent to your registered mobile number. Thank you. Reply with 1 to continue or 0 to Exit.')
+        .option('1. Continue')
+        .option('0. Exit')
         .build(),
     USSDService.__INPUT_TYPES__.EXACT,
     {
-        // '1': 'SALES_DETAILS_AMOUNT',
-        '0': 'REPORTS'
+        '1': 'WELCOME',
+        '0': 'END'
     }
 );
