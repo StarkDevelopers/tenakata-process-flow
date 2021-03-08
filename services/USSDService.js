@@ -22,7 +22,8 @@ class USSDService {
       SAVE_CASH_CREDIT_SALES_DETAILS: 'saveCashCreditSalesDetails',
       SAVE_CASH_MONEY_OUT_DETAILS: 'saveCashMoneyOutDetails',
       SEND_REPORT_MESSAGE: 'sendReportMessage',
-      MOVE_TO_SEND_REPORT_SMS_STATE: 'moveToSendReportSMSStage'
+      PEOPLE_WHO_OWE_ME_MONEY: 'sendPeopleWhoOweMeMoneyReport',
+      PEOPLE_I_OWE_MONEY: 'sendPeopleIOweMeMoneyReport'
     };
   }
 
@@ -289,7 +290,7 @@ class USSDService {
       cashDate = cashDateSelection == 1 ? moment().format('YYYY-MM-DD') : moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD');
       const salesUrl = URLS.SALES.replace('[USER_ID]', id)
         .replace('[SALES_OR_PURCHASE]', 'sales')
-        .replace('[DATE]',cashDate)
+        .replace('[DATE]', cashDate)
         .replace('[AMOUNT]', amount)
         .replace('[DETAILS]', details)
         .replace('[PAYMENT_TYPE]', subMenu === 'cash' ? 'cash' : 'credit')
@@ -335,7 +336,7 @@ class USSDService {
       cashDate = cashDateSelection == 1 ? moment().format('YYYY-MM-DD') : moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD');
       const salesUrl = URLS.MONEY_OUT.replace('[USER_ID]', id)
         .replace('[SALES_OR_PURCHASE]', 'purchase')
-        .replace('[DATE]',cashDate)
+        .replace('[DATE]', cashDate)
         .replace('[AMOUNT]', amount)
         .replace('[DETAILS]', details)
         .replace('[PAYMENT_TYPE]', subMenu === 'cash' ? 'cash' : 'credit')
@@ -379,10 +380,29 @@ class USSDService {
     }
   }
 
-  async moveToSendReportSMSStage(_, session) {
-    
-    return this.states['SEND_REPORT_MESSAGE'];
+
+  async sendPeopleWhoOweMeMoneyReport(_, session) {
+    try {
+
+      return this.states['WILL_SEND_TEXT_MESSAGE']
+    }
+    catch (error) {
+      console.error(`Error: Sending Message of People Who Owe Me Money Report: ${error.stack}`);
+      this.throwError(this.UNEXPECTED_ERROR);
+    }
   }
+
+  async sendPeopleIOweMeMoneyReport(_, session) {
+    try {
+
+      return this.states['WILL_SEND_TEXT_MESSAGE']
+    }
+    catch (error) {
+      console.error(`Error: Sending Message of People I Owe Money Report: ${error.stack}`);
+      this.throwError(this.UNEXPECTED_ERROR);
+    }
+  }
+
 }
 
 module.exports = new USSDService();

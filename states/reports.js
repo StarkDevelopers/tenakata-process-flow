@@ -60,17 +60,17 @@ USSDService.state(
     null,
     USSDService.__INPUT_TYPES__.HANDLER,
     {
-        handler: USSDService.services.MOVE_TO_SEND_REPORT_SMS_STATE
+        handler: USSDService.services.PEOPLE_WHO_OWE_ME_MONEY
     }
 );
 
- 
+
 USSDService.state(
     'PEOPLE_I_OWE_MONEY',
     null,
     USSDService.__INPUT_TYPES__.HANDLER,
     {
-        handler: USSDService.services.MOVE_TO_SEND_REPORT_SMS_STATE
+        handler: USSDService.services.PEOPLE_I_OWE_MONEY
     }
 );
 
