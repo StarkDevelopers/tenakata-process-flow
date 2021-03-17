@@ -23,7 +23,8 @@ class USSDService {
       SAVE_CASH_MONEY_OUT_DETAILS: 'saveCashMoneyOutDetails',
       SEND_REPORT_MESSAGE: 'sendReportMessage',
       PEOPLE_WHO_OWE_ME_MONEY: 'sendPeopleWhoOweMeMoneyReport',
-      PEOPLE_I_OWE_MONEY: 'sendPeopleIOweMeMoneyReport'
+      PEOPLE_I_OWE_MONEY: 'sendPeopleIOweMeMoneyReport',
+      SAVE_REFER_A_FRIEND_DETAILS:'saveReferAFriendDetails'
     };
   }
 
@@ -401,6 +402,47 @@ class USSDService {
       console.error(`Error: Sending Message of People I Owe Money Report: ${error.stack}`);
       this.throwError(this.UNEXPECTED_ERROR);
     }
+  }
+
+  //************ Save Refer A Friend Details ********************/
+
+  async saveReferAFriendDetails(_, session) {
+    try {
+      let {
+        id,
+        phoneNumber,
+        referAFriendName,
+        referAFriendMobileNumber,
+        token
+      } = session;
+
+      phoneNumber=phoneNumber.substring(4);
+      
+      const data = '{}';
+      const referAFriendUrl = URLS.REFER_A_FRIEND.replace('[USER_ID]', id)
+        .replace('[USER_PHONE_NUMBER]', phoneNumber)
+        .replace('[REFEREE_PHONE_NUMBER]', referAFriendMobileNumber)
+        .replace('[REFERE_NAME]', referAFriendName)
+
+      const headers = {
+        'x-api-key': 'admin@123',
+        token
+      };
+
+      const jsonResponse = await fetch(referAFriendUrl, 'post', data, headers);
+
+      console.log(`Response: Save Refer A Friend Details Details: ${JSON.stringify(jsonResponse)}`);
+
+      if (jsonResponse.status == 200) {
+        return this.states['REFER_A_FRIEND_DETAILS_SAVED'];
+      }
+
+      return this.states['REFER_A_FRIEND_DETAILS_FAILED'];
+    } catch (error) {
+      console.error(`Error: Save Refer A Friend Details: ${error.stack}`);
+      this.throwError(this.UNEXPECTED_ERROR);
+    }
+
   }
 
 }

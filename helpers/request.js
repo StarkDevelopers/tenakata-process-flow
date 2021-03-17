@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const API_ENDPOINT = process.env.API_ENDPOINT || 'http://ec2-18-219-231-177.us-east-2.compute.amazonaws.com/index.php';
+const API_ENDPOINT = process.env.API_ENDPOINT;
 
 module.exports = async (path, method, body, headers) => {
   const config = {

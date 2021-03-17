@@ -23,10 +23,20 @@ USSDService.state(
     USSDService.__INPUT_TYPES__.REGEX,
     {
         regex: '^[a-zA-Z]+\\s+[a-zA-Z]+$',
-        state: 'REFER_A_FRIEND_DETAILS_SAVED'
+        state: 'SAVE_REFER_A_FRIEND_DETAILS'
     },
     'referAFriendName'
 );
+
+
+USSDService.state(
+    'SAVE_REFER_A_FRIEND_DETAILS',
+    null,
+    USSDService.__INPUT_TYPES__.HANDLER,
+    {
+      handler: USSDService.services.SAVE_REFER_A_FRIEND_DETAILS
+    }
+  );
 
 USSDService.state(
     'REFER_A_FRIEND_DETAILS_SAVED',
@@ -39,3 +49,15 @@ USSDService.state(
         '1': 'WELCOME'
     }
 );
+
+
+USSDService.state(
+    'REFER_A_FRIEND_DETAILS_FAILED',
+    new USSDMenu()
+      .menu('Failed to save Refer A Friend Details.')
+      .build(),
+    null,
+    null,
+    null,
+    true
+  );
