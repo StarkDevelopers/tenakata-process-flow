@@ -122,7 +122,7 @@ USSDService.state(
     '2': 'MONEY_OUT',
     '3': 'REPORTS',
     '4': 'REFER_A_FRIEND_MOBILE_NUMBER',
-    '5': 'TERMS_AND_CONDITIONS',
+    '5': 'SEND_TERMS_AND_CONDITIONS_MESSAGE',
     '0': 'END'
   },
   {
@@ -140,7 +140,17 @@ USSDService.state(
 
 
 USSDService.state(
-  'TERMS_AND_CONDITIONS',
+  'SEND_TERMS_AND_CONDITIONS_MESSAGE',
+  null,
+  USSDService.__INPUT_TYPES__.HANDLER,
+  {
+    handler: USSDService.services.SEND_TERMS_AND_CONDITIONS_MESSAGE
+  }
+);
+
+
+USSDService.state(
+  'SEND_TERMS_AND_CONDITIONS_MESSAGE_SUCESSS',
   new USSDMenu()
     .menu('An SMS Message will be sent to your Phone with the Terms and Conditions')
     .setSelectText('Press 1 to return to main menu.')
@@ -148,9 +158,21 @@ USSDService.state(
   USSDService.__INPUT_TYPES__.EXACT,
   {
     '1': 'WELCOME'
-  //   // '2': 'PRIVACY_POLICY_NO'
   }
 );
+
+
+USSDService.state(
+  'SEND_TERMS_AND_CONDITIONS_MESSAGE_FAILED',
+  new USSDMenu()
+    .menu('Failed to send Terms & Conditions message.')
+    .build(),
+  null,
+  null,
+  null,
+  true
+);
+
 
 USSDService.state(
   'END',

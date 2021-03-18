@@ -142,3 +142,16 @@ USSDService.state(
         '0': 'END'
     }
 );
+
+
+// common state if sending message is failed
+USSDService.state(
+    'SEND_MESSAGE_FAILED',
+    new USSDMenu()
+      .menu('Failed to send message of reports.')
+      .build(),
+    null,
+    null,
+    null,
+    true
+  );

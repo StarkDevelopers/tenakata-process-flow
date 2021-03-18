@@ -7,7 +7,8 @@ module.exports = {
 
   // TODO: Add Reports API Here
   'REPORTS': {
-
+     'MY_PROFIT':'/profit_loss_report_ussd?business_id=[BUSINESS_ID]&frequency=[FREQUENCY]'
   },
-  'REFER_A_FRIEND':'/refer_a_friend?user_id=[USER_ID]&user_phone_number=[USER_PHONE_NUMBER]&referee_phone_number=[REFEREE_PHONE_NUMBER]&referee_name=[REFERE_NAME]'
+  'REFER_A_FRIEND':'/refer_a_friend?user_id=[USER_ID]&user_phone_number=[USER_PHONE_NUMBER]&referee_phone_number=[REFEREE_PHONE_NUMBER]&referee_name=[REFERE_NAME]',
+  'TERMS_AND_CONDITIONS':'/terms_and_conditions?user_id=[USER_ID]&user_phone_number=[USER_PHONE_NUMBER]'
 };

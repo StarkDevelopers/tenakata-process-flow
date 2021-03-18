@@ -19,6 +19,7 @@ class USSDService {
       REGISTRATION_CHECK: 'registrationCheck',
       AUTHENTICATION: 'authentication',
       FIRST_TIME_USER_CHECK: 'firstTimeUserCheck',
+      SEND_TERMS_AND_CONDITIONS_MESSAGE:'sendTermsAndConditionsMsg',
       SAVE_CASH_CREDIT_SALES_DETAILS: 'saveCashCreditSalesDetails',
       SAVE_CASH_MONEY_OUT_DETAILS: 'saveCashMoneyOutDetails',
       SEND_REPORT_MESSAGE: 'sendReportMessage',
@@ -370,13 +371,37 @@ class USSDService {
   async sendReportMessage(_, session) {
     try {
       //Based on previous state use API URL
+      const askingReport=session.previousState;
       console.log(session.previousState);
       // Parameter of which time range user wants reports. Today, Weekly or Monthly.
+      const reportFrequency=session.reportTimeRange.toLowerCase();
       console.log(session.reportTimeRange)
-      return this.states['WILL_SEND_TEXT_MESSAGE']
+
+      let {
+        id,
+        token
+      } = session;
+      
+      const data = '{}';
+      const  reportURL= URLS.REPORTS[askingReport]
+        .replace('[BUSINESS_ID]', id)
+        .replace('[FREQUENCY]', reportFrequency)
+       
+      const headers = {
+        'x-api-key': 'admin@123',
+        token
+      };
+
+      const jsonResponse = await fetch(reportURL, 'post', data, headers);
+      console.log(`Response: Sending Reports Message: ${JSON.stringify(jsonResponse)}`);
+
+      if (jsonResponse.status == 200) {
+        return this.states['WILL_SEND_TEXT_MESSAGE']
+      }
+      return this.states['SEND_MESSAGE_FAILED'];
     }
     catch (error) {
-      console.error(`Error: Sending Message of Expenses Report: ${error.stack}`);
+      console.error(`Error: Sending Reports Message: ${error.stack}`);
       this.throwError(this.UNEXPECTED_ERROR);
     }
   }
@@ -443,6 +468,43 @@ class USSDService {
       this.throwError(this.UNEXPECTED_ERROR);
     }
 
+  }
+
+  /******* Send Terms and Conditions Message *************/
+
+  async sendTermsAndConditionsMsg(_, session)
+  {
+    try {
+      let {
+        id,
+        phoneNumber,
+        token
+      } = session;
+
+      phoneNumber=phoneNumber.substring(4);
+      
+      const data = '{}';
+      const termsAndConditionsUrl = URLS.TERMS_AND_CONDITIONS
+        .replace('[USER_ID]', id)
+        .replace('[USER_PHONE_NUMBER]', phoneNumber)
+        
+      const headers = {
+        'x-api-key': 'admin@123',
+        token
+      };
+
+      const jsonResponse = await fetch(termsAndConditionsUrl, 'post', data, headers);
+      console.log(`Response: Send Terms and Conditions Message: ${JSON.stringify(jsonResponse)}`);
+
+      if (jsonResponse.status == 200) {
+        return this.states['SEND_TERMS_AND_CONDITIONS_MESSAGE_SUCESSS'];
+      }
+
+      return this.states['SEND_TERMS_AND_CONDITIONS_MESSAGE_FAILED'];
+    } catch (error) {
+      console.error(`Error: Sending message of Terms & Conidtions : ${error.stack}`);
+      this.throwError(this.UNEXPECTED_ERROR);
+    }
   }
 
 }
