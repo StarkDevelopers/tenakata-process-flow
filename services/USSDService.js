@@ -227,10 +227,6 @@ class USSDService {
       const authenticationUrl = URLS.AUTHENTICATION.replace('[PHONE_NUMBER]', phoneNumber).replace('[COUNTRY_CODE]', countryCode);
       let jsonResponse = await fetch(authenticationUrl, 'post', data, headers);
 
-      if (typeof jsonResponse !== 'object') {
-        jsonResponse = JSON.parse(jsonResponse);
-      }
-
       if (jsonResponse.status == 200) {
         session.id = jsonResponse.result.id;
         session.ownerName = jsonResponse.result.owner_name;
@@ -284,19 +280,37 @@ class USSDService {
         amount,
         description,
         details,
-        token
+        token,
+        phoneNumber
       } = session;
 
       const data = '{}';
       let cashDate;
       cashDate = cashDateSelection == 1 ? moment().format('YYYY-MM-DD') : moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD');
-      const salesUrl = URLS.SALES.replace('[USER_ID]', id)
-        .replace('[SALES_OR_PURCHASE]', 'sales')
-        .replace('[DATE]', cashDate)
-        .replace('[AMOUNT]', amount)
-        .replace('[DETAILS]', details)
-        .replace('[PAYMENT_TYPE]', subMenu === 'cash' ? 'cash' : 'credit')
-        .replace('[DESCRIPTION]', description);
+
+      let salesUrl;
+      if (subMenu === 'cash') {
+        salesUrl = URLS.SALES.replace('[USER_ID]', id)
+          .replace('[SALES_OR_PURCHASE]', 'sales')
+          .replace('[DATE]', cashDate)
+          .replace('[AMOUNT]', amount)
+          .replace('[DETAILS]', details)
+          .replace('[PAYMENT_TYPE]', 'cash')
+          .replace('[DESCRIPTION]', description);
+      } else {
+        const countryCode = phoneNumber.substring(1, 4);
+        const userPhoneNumber = phoneNumber.substring(4);
+
+        salesUrl = URLS.CREDIT_SALES.replace('[USER_ID]', id)
+          .replace('[SALES_OR_PURCHASE]', 'sales')
+          .replace('[DATE]', cashDate)
+          .replace('[AMOUNT]', amount)
+          .replace('[DETAILS]', details)
+          .replace('[PAYMENT_TYPE]', 'credit')
+          .replace('[DESCRIPTION]', description)
+          .replace('[PHONE_NUMBER]', userPhoneNumber)
+          .replace('[COUNTRY_CODE]', countryCode);
+      }
 
       const headers = {
         'x-api-key': 'admin@123',
@@ -304,7 +318,6 @@ class USSDService {
       };
 
       const jsonResponse = await fetch(salesUrl, 'post', data, headers);
-
       console.log(`Response: Save Cash Credit Sales Details: ${JSON.stringify(jsonResponse)}`);
 
       if (jsonResponse.status == 200) {
@@ -330,20 +343,39 @@ class USSDService {
         description,
         descriptionType,
         details,
-        token
+        token,
+        phoneNumber
       } = session;
 
       const data = '{}';
       let cashDate;
       cashDate = cashDateSelection == 1 ? moment().format('YYYY-MM-DD') : moment(date, 'DDMMYYYY', true).format('YYYY-MM-DD');
-      const salesUrl = URLS.MONEY_OUT.replace('[USER_ID]', id)
-        .replace('[SALES_OR_PURCHASE]', 'purchase')
-        .replace('[DATE]', cashDate)
-        .replace('[AMOUNT]', amount)
-        .replace('[DETAILS]', details)
-        .replace('[PAYMENT_TYPE]', subMenu === 'cash' ? 'cash' : 'credit')
-        .replace('[DESCRIPTION]', description)
-        .replace('[DESCRIPTION_TYPE]', descriptionType);
+      let salesUrl;
+      
+      if (subMenu === 'cash') {
+        salesUrl = URLS.MONEY_OUT.replace('[USER_ID]', id)
+          .replace('[SALES_OR_PURCHASE]', 'purchase')
+          .replace('[DATE]', cashDate)
+          .replace('[AMOUNT]', amount)
+          .replace('[DETAILS]', details)
+          .replace('[PAYMENT_TYPE]', 'cash')
+          .replace('[DESCRIPTION]', description)
+          .replace('[DESCRIPTION_TYPE]', descriptionType);
+      } else {
+        const countryCode = phoneNumber.substring(1, 4);
+        const userPhoneNumber = phoneNumber.substring(4);
+
+        salesUrl = URLS.CREDIT_MONEY_OUT.replace('[USER_ID]', id)
+          .replace('[SALES_OR_PURCHASE]', 'purchase')
+          .replace('[DATE]', cashDate)
+          .replace('[AMOUNT]', amount)
+          .replace('[DETAILS]', details)
+          .replace('[PAYMENT_TYPE]', 'credit')
+          .replace('[DESCRIPTION]', description)
+          .replace('[DESCRIPTION_TYPE]', descriptionType)
+          .replace('[PHONE_NUMBER]', userPhoneNumber)
+          .replace('[COUNTRY_CODE]', countryCode);
+      }
 
       const headers = {
         'x-api-key': 'admin@123',
@@ -351,7 +383,6 @@ class USSDService {
       };
 
       const jsonResponse = await fetch(salesUrl, 'post', data, headers);
-
       console.log(`Response: Save Cash Money Out Details: ${JSON.stringify(jsonResponse)}`);
 
       if (jsonResponse.status == 200) {
@@ -371,10 +402,10 @@ class USSDService {
   async sendReportMessage(_, session) {
     try {
       //Based on previous state use API URL
-      const askingReport=session.previousState;
+      const askingReport = session.previousState;
       console.log(session.previousState);
       // Parameter of which time range user wants reports. Today, Weekly or Monthly.
-      const reportFrequency=session.reportTimeRange.toLowerCase();
+      const reportFrequency = session.reportTimeRange.toLowerCase();
       console.log(session.reportTimeRange)
 
       let {
@@ -383,7 +414,7 @@ class USSDService {
       } = session;
       
       const data = '{}';
-      const  reportURL= URLS.REPORTS[askingReport]
+      const  reportURL = URLS.REPORTS[askingReport]
         .replace('[BUSINESS_ID]', id)
         .replace('[FREQUENCY]', reportFrequency)
        
@@ -399,20 +430,17 @@ class USSDService {
         return this.states['WILL_SEND_TEXT_MESSAGE']
       }
       return this.states['SEND_MESSAGE_FAILED'];
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`Error: Sending Reports Message: ${error.stack}`);
       this.throwError(this.UNEXPECTED_ERROR);
     }
   }
 
-
   async sendPeopleWhoOweMeMoneyReport(_, session) {
     try {
 
       return this.states['WILL_SEND_TEXT_MESSAGE']
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`Error: Sending Message of People Who Owe Me Money Report: ${error.stack}`);
       this.throwError(this.UNEXPECTED_ERROR);
     }
@@ -422,8 +450,7 @@ class USSDService {
     try {
 
       return this.states['WILL_SEND_TEXT_MESSAGE']
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`Error: Sending Message of People I Owe Money Report: ${error.stack}`);
       this.throwError(this.UNEXPECTED_ERROR);
     }
@@ -441,7 +468,7 @@ class USSDService {
         token
       } = session;
 
-      phoneNumber=phoneNumber.substring(4);
+      phoneNumber = phoneNumber.substring(4);
       
       const data = '{}';
       const referAFriendUrl = URLS.REFER_A_FRIEND.replace('[USER_ID]', id)
@@ -455,7 +482,6 @@ class USSDService {
       };
 
       const jsonResponse = await fetch(referAFriendUrl, 'post', data, headers);
-
       console.log(`Response: Save Refer A Friend Details Details: ${JSON.stringify(jsonResponse)}`);
 
       if (jsonResponse.status == 200) {
@@ -472,8 +498,7 @@ class USSDService {
 
   /******* Send Terms and Conditions Message *************/
 
-  async sendTermsAndConditionsMsg(_, session)
-  {
+  async sendTermsAndConditionsMsg(_, session) {
     try {
       let {
         id,
@@ -497,12 +522,12 @@ class USSDService {
       console.log(`Response: Send Terms and Conditions Message: ${JSON.stringify(jsonResponse)}`);
 
       if (jsonResponse.status == 200) {
-        return this.states['SEND_TERMS_AND_CONDITIONS_MESSAGE_SUCESSS'];
+        return this.states['SEND_TERMS_AND_CONDITIONS_MESSAGE_SUCCESS'];
       }
 
       return this.states['SEND_TERMS_AND_CONDITIONS_MESSAGE_FAILED'];
     } catch (error) {
-      console.error(`Error: Sending message of Terms & Conidtions : ${error.stack}`);
+      console.error(`Error: Sending message of Terms & Conditions : ${error.stack}`);
       this.throwError(this.UNEXPECTED_ERROR);
     }
   }

@@ -6,19 +6,19 @@ USSDService.state(
   new USSDMenu()
     .menu('Select')
     .option('1. Cash')
-    // .option('2. Credit Sale')
+    .option('2. Credit Sale')
     .option('0. Back')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
     '1': 'SALES_DATE_SELECTION',
-    // '2': 'SALES_DETAILS_DATE',
+    '2': 'SALES_DATE_SELECTION',
     '0': 'WELCOME'
   },
   {
     'subMenu': {
       1: 'cash',
-      // 2: 'creditSale',
+      2: 'credit',
       0: 'back'
     }
   }
@@ -42,7 +42,7 @@ USSDService.state(
 USSDService.state(
   'SALES_DETAILS_DATE',
   new USSDMenu()
-    .menu('Enter Date in the format DDMMYYYY (e.g. 25022021)')
+    .menu('Enter Date in the format DDMMYYYY (Example: 25022021)')
     .build(),
   USSDService.__INPUT_TYPES__.DATE,
   {

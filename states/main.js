@@ -136,9 +136,6 @@ USSDService.state(
   }
 );
 
-
-
-
 USSDService.state(
   'SEND_TERMS_AND_CONDITIONS_MESSAGE',
   null,
@@ -148,19 +145,19 @@ USSDService.state(
   }
 );
 
-
 USSDService.state(
-  'SEND_TERMS_AND_CONDITIONS_MESSAGE_SUCESSS',
+  'SEND_TERMS_AND_CONDITIONS_MESSAGE_SUCCESS',
   new USSDMenu()
-    .menu('An SMS Message will be sent to your Phone with the Terms and Conditions')
-    .setSelectText('Press 1 to return to main menu.')
+    .menu('An SMS Message will be sent to your Phone with the Terms and Conditions.')
+    .option('1. Continue')
+    .option('0. Exit')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
-    '1': 'WELCOME'
+    '1': 'WELCOME',
+    '0': 'END'
   }
 );
-
 
 USSDService.state(
   'SEND_TERMS_AND_CONDITIONS_MESSAGE_FAILED',
@@ -172,7 +169,6 @@ USSDService.state(
   null,
   true
 );
-
 
 USSDService.state(
   'END',

@@ -19,5 +19,9 @@ module.exports = async (path, method, body, headers) => {
     jsonResponse = JSON.parse(JSON.stringify(response.data));
   }
 
+  if (typeof jsonResponse !== 'object') {
+    jsonResponse = JSON.parse(jsonResponse);
+  }
+
   return jsonResponse;
 }

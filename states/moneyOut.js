@@ -6,19 +6,19 @@ USSDService.state(
   new USSDMenu()
     .menu('Select')
     .option('1. Cash')
-    // .option('2. Credit')
+    .option('2. Credit')
     .option('0. Back')
     .build(),
   USSDService.__INPUT_TYPES__.EXACT,
   {
     '1': 'MONEY_OUT_DATE_SELECTION',
-    // '2': '',
+    '2': 'MONEY_OUT_DATE_SELECTION',
     '0': 'WELCOME'
   },
   {
     'subMenu': {
       1: 'cash',
-      // 2: 'creditSale',
+      2: 'credit',
       0: 'back'
     }
   }
