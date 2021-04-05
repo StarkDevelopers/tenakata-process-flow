@@ -401,6 +401,10 @@ class USSDService {
 
   async sendReportMessage(_, session) {
     try {
+      if (!URLS.REPORTS[askingReport]) {
+        return this.states['WILL_SEND_TEXT_MESSAGE']
+      }
+
       //Based on previous state use API URL
       const askingReport = session.previousState;
       console.log(session.previousState);
