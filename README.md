@@ -17,7 +17,9 @@
 3. **Add Rule** with following properties
 
 > **Type**: Custom TCP
+>
 > **Port range**: 8080
+>
 > **Source**: Anywhere
 
 ### Setup EC2 Instance
